@@ -21,9 +21,18 @@ async function run() {
   try {
     const serviceCollection = client.db("visaration").collection("services");
 
+    //server route
     app.get("/services", async (req, res) => {
       const cursor = serviceCollection.find({});
       const services = await cursor.toArray();
+      res.send(services);
+    });
+
+    //home route
+    app.get("/home", async (req, res) => {
+      const cursor = serviceCollection.find({});
+      const limdata = cursor.limit(3);
+      const services = await limdata.toArray();
       res.send(services);
     });
 
