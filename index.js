@@ -20,6 +20,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const serviceCollection = client.db("visaration").collection("services");
+    const reviewCollection = client.db("visaration").collection("reviews");
 
     //server route
     app.get("/services", async (req, res) => {
@@ -45,18 +46,12 @@ async function run() {
       res.send(result);
     });
 
-    //   app.post("/users", async (req, res) => {
-    //     console.log("Post API called");
-    //     const user = req.body;
-
-    // users.push(user);
-    // console.log(user);
-    // const result = await userCollection.insertOne(user);
-    // console.log(result);
-    // user._id = result.insertedId;
-    // res.send(user);
-    // console.log(req.body);
-    //   });
+    // reviews api
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.send(result);
+    });
   } finally {
   }
 }
