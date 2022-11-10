@@ -1,9 +1,9 @@
 /** @format */
 
-const express = require('express');
-const cors = require('cors');
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-
+const express = require("express");
+const cors = require("cors");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+require("dotenv").config();
 const app = express();
 
 //middile ware
@@ -11,8 +11,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const uri =
-  'mongodb+srv://rahi:MLM4HtxSaGKzxXAO@cluster0.ap4ff9h.mongodb.net/?retryWrites=true&w=majority';
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.ap4ff9h.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -21,18 +20,18 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    const serviceCollection = client.db('visaration').collection('services');
-    const reviewCollection = client.db('visaration').collection('reviews');
+    const serviceCollection = client.db("visaration").collection("services");
+    const reviewCollection = client.db("visaration").collection("reviews");
 
     //server route
-    app.get('/services', async (req, res) => {
+    app.get("/services", async (req, res) => {
       const cursor = serviceCollection.find({});
       const services = await cursor.toArray();
       res.send(services);
     });
 
     //home route
-    app.get('/home', async (req, res) => {
+    app.get("/home", async (req, res) => {
       const cursor = serviceCollection.find({});
       const limdata = cursor.limit(3);
       const services = await limdata.toArray();
@@ -40,7 +39,7 @@ async function run() {
     });
 
     // service single route / service id route
-    app.get('/services/:id', async (req, res) => {
+    app.get("/services/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
 
@@ -48,7 +47,7 @@ async function run() {
       res.send(result);
     });
 
-    app.post('/services', async (req, res) => {
+    app.post("/services", async (req, res) => {
       const service = req.body;
       const result = await serviceCollection.insertOne(service);
       console.log(result);
@@ -58,7 +57,7 @@ async function run() {
     // reviews api
 
     //review get api
-    app.get('/reviews/:service', async (req, res) => {
+    app.get("/reviews/:service", async (req, res) => {
       // let query = {};
       // const id = req.params.id;
       // if(req.query.id){
@@ -75,7 +74,7 @@ async function run() {
     });
 
     //get review page
-    app.get('/reviews', async (req, res) => {
+    app.get("/reviews", async (req, res) => {
       let query = {};
       if (req.query.email) {
         query = {
@@ -87,27 +86,27 @@ async function run() {
       res.send(reviews);
     });
 
-    app.post('/reviews', async (req, res) => {
+    app.post("/reviews", async (req, res) => {
       const review = req.body;
       const result = await reviewCollection.insertOne(review);
       res.send(result);
     });
 
-    app.delete('/reviews/:id', async (req, res) => {
+    app.delete("/reviews/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await reviewCollection.deleteOne(query);
       res.send(result);
     });
 
-    app.get('/review/:id', async (req, res) => {
+    app.get("/review/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await reviewCollection.findOne(query);
       res.send(result);
     });
 
-    app.put('/review/:id', async (req, res) => {
+    app.put("/review/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) };
       const review = req.body;
