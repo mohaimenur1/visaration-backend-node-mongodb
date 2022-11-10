@@ -48,6 +48,13 @@ async function run() {
       res.send(result);
     });
 
+    app.post('/services', async (req, res) => {
+      const service = req.body;
+      const result = await serviceCollection.insertOne(service);
+      console.log(result);
+      res.send(service);
+    });
+
     // reviews api
 
     //review get api
@@ -68,10 +75,53 @@ async function run() {
     });
 
     //get review page
+    app.get('/reviews', async (req, res) => {
+      let query = {};
+      if (req.query.email) {
+        query = {
+          useremail: req.query.email,
+        };
+      }
+      const cursor = reviewCollection.find(query);
+      const reviews = await cursor.toArray();
+      res.send(reviews);
+    });
 
     app.post('/reviews', async (req, res) => {
       const review = req.body;
       const result = await reviewCollection.insertOne(review);
+      res.send(result);
+    });
+
+    app.delete('/reviews/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await reviewCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    app.get('/review/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await reviewCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.put('/review/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const review = req.body;
+      const option = { upsert: true };
+      const updatedReview = {
+        $set: {
+          textarea: review.textarea,
+        },
+      };
+      const result = await reviewCollection.updateOne(
+        filter,
+        updatedReview,
+        option
+      );
       res.send(result);
     });
   } finally {
